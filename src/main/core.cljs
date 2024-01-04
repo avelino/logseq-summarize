@@ -28,7 +28,7 @@
   "Registering slash commands in Logseq"
   (doseq [cmd ["summarize" "sum"]]
     (devlog "Registering slash command:" cmd)
-    (ls/register-slash-command cmd (fn [] (summarize-block)))))
+    (ls/register-slash-command cmd summarize-block)))
 
 ; Logseq handshake
 ; JS equivalent: `logseq.ready(main).catch(() => console.error)`
