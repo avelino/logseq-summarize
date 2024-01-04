@@ -1,0 +1,36 @@
+{:source-paths ["src/dev" "src/main"]
+ :dependencies
+ [[binaryage/devtools "1.0.7"]
+  [djblue/portal "0.51.0"]
+  [funcool/promesa "11.0.678"]
+  [medley "1.4.0"]
+  [funcool/cuerdas "2023.11.09-407"]
+  [rum "0.12.11"]
+  [lambdaisland/fetch "1.5.83"]]
+ :dev-http {8080 "dist"}
+ :nrepl {:port 8702
+         :middleware [portal.nrepl/wrap-portal]
+         :init-ns core}
+ :compiler-options {:infer-externs      :auto
+                    :output-feature-set :es-next
+                    :source-map         true
+                    :source-map-detail-level :all
+                    :warnings           {:fn-deprecated false}}
+ :builds
+ {:plugin {:target :browser
+           :module-loader true
+           :output-dir "dist"
+           :modules  {:index {:init-fn core/-init}}
+           :build-hooks [(portal.shadow.remote/hook)]
+           :devtools {:preloads [devtools.preload
+                                 portal.setup]
+                      :after-load core/reload
+                      :repl-pprint true
+                      :watch-dir "dist"} ; Doesn't work for Logseq dev mode. Have to reload plugin.
+           :dev {}
+           :release {:compiler-options {:optimizations :advanced}}}
+  :test {:target    :node-test ; simple TDD than browser-test dependency setup
+         :output-to "out/node-test.js"
+         :ns-regexp "-spec$"
+         :autorun   true
+         :devtools  {:repl-pprint true}}}}

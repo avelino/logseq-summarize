@@ -1,0 +1,24 @@
+{
+  "name": "logseq-summarize",
+  "version": "0.0.1",
+  "description": "A Logseq plugin to optimize your time with concise summaries of web pages and YouTube videos.",
+  "author": "https://github.com/avelino",
+  "main": "./dist/index.html",
+  "license": "MIT",
+  "logseq": {
+    "id": "logseq-summarize",
+    "title": "Summarize",
+    "main": "dist/index.html",
+    "icon": "dist/icon.png",
+    "favicon": "dist/favicon.ico"
+  },
+  "scripts": {
+    "tasks": "echo 'Please use babashka tasks defined in bb.edn. (https://babashka.org)'"
+  },
+  "devDependencies": {
+    "shadow-cljs": "2.26.2"
+  },
+  "dependencies": {
+    "@logseq/libs": "0.0.17"
+  }
+}
