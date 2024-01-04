@@ -16,7 +16,7 @@
       (p/let [link         (if (u/md-link? line-content)
                              (:link (u/str->md-link line-content))
                              line-content)
-              tldr-content (tldr/get-url link)]
+              tldr-content (tldr/summarize-url link)]
         (devlog :summarize-block/link link)
         (if (or (empty? (:body tldr-content))
                 (not= (:status tldr-content) 200))
