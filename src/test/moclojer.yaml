@@ -1,0 +1,17 @@
+- endpoint:
+    method: GET
+    path: /url/:url
+    response:
+      status: 200
+      headers:
+        Content-Type: application/json
+      body: >
+        The text describes a conversation between an orbiter in space and Houston, where the orbiter reports a problem with its O2 tank. The person in Houston responds dismissively and ends the call. The text also includes a humorous title text and a note about the preferred viewing conditions for xkcd.com.
+- endpoint:
+    method: POST
+    path: /summarize
+    response:
+      status: 303
+      headers:
+        Content-Type: application/json
+      body: ""

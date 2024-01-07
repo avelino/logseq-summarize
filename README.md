@@ -15,3 +15,11 @@ Need to have clojure (and java) and [babashka](https://babashka.org/) installed 
 ```bash
 bb run dev
 ```
+
+### tldr.chat mock server
+
+```bash
+docker run -it \
+  -p 8000:8000 -v $(pwd)/moclojer.yml:/app/moclojer.yml \
+  ghcr.io/moclojer/moclojer:dev
+```
