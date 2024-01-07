@@ -1,5 +1,6 @@
 (ns core
   (:require ["@logseq/libs"]
+            [clojure.string :refer [trim]]
             [ls]
             [promesa.core :as p]
             [tldr]
@@ -13,15 +14,13 @@
           block-uuid    (aget current-block "uuid")]
     (if (or (u/http? line-content)
             (u/md-link? line-content))
-      (p/let [link         (if (u/md-link? line-content)
-                             (:link (u/str->md-link line-content))
-                             line-content)
-              tldr-content (tldr/summarize-url link)]
-        (devlog :summarize-block/link link)
-        (if (or (empty? (:body tldr-content))
-                (not= (:status tldr-content) 200))
+      (p/let [link         (u/extract-link line-content)
+              block-uuid-child (:uuid (ls/insert-block block-uuid "processing: calling tldr.chat..."))
+              tldr-content (tldr/summarize-url (trim link))]
+        (devlog "block-uuid-child:" block-uuid-child)
+        (if (empty? (:body tldr-content))
           (ls/show-msg ":logseq-summarize/error no content found" "error")
-          (ls/insert-block block-uuid (:body tldr-content))))
+          (ls/update-block block-uuid-child (:body tldr-content))))
       (ls/show-msg ":logseq-summarize/error content is not a link" "error"))))
 
 (defn main []

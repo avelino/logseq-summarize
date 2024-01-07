@@ -45,6 +45,13 @@
 (defn md-link? [s]
   (some? (:link (str->md-link s))))
 
+(defn extract-link
+  "extract link from current line content"
+  [line-content]
+  (if (md-link? line-content)
+    (:link (str->md-link line-content))
+    line-content))
+
 (comment
   (str->md-link "[I'm label](I'm link)")
   (md-link->str {:label "I'm label" :link "Just a link"}))
