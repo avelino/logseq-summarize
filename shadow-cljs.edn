@@ -1,12 +1,4 @@
-{:source-paths ["src/dev" "src/main"]
- :dependencies
- [[binaryage/devtools "1.0.7"]
-  [djblue/portal "0.51.0"]
-  [funcool/promesa "11.0.678"]
-  [medley "1.4.0"]
-  [funcool/cuerdas "2023.11.09-407"]
-  [rum "0.12.11"]
-  [lambdaisland/fetch "1.5.83"]]
+{:deps true
  :dev-http {8080 "dist"}
  :nrepl {:port 8702
          :middleware [portal.nrepl/wrap-portal]
