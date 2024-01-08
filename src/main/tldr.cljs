@@ -3,7 +3,10 @@
             [promesa.core :as p]
             [util :refer [devlog]]))
 
-(def ^:private api-host "https://tldr.chat/")
+(def ^:private api-host
+  (if goog.DEBUG
+    "http://127.0.0.1:8000/"
+    "https://tldr.chat/"))
 
 ;; curl -H 'Accept: text/markdown' https://tldr.chat/url/https://xkcd.com/1438/
 (defn- get-url

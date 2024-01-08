@@ -14,15 +14,14 @@
           block-uuid    (aget current-block "uuid")]
     (if (or (u/http? line-content)
             (u/md-link? line-content))
-      (p/let [link         (u/extract-link line-content)
-              block-uuid-child (:uuid (ls/insert-block block-uuid "processing: calling tldr.chat..."))
+      (p/let [link       (u/extract-link line-content)
+              uuid-child (:uuid (ls/insert-block block-uuid
+                                                 "processing: calling tldr.chat..."))
               tldr-content (tldr/summarize-url (trim link))]
-        (devlog "block-uuid-child:" block-uuid-child)
         (if (empty? (:body tldr-content))
           (ls/show-msg ":logseq-summarize/error no content found" "error")
-          (ls/update-block block-uuid-child (:body tldr-content))))
+          (ls/update-block uuid-child (:body tldr-content))))
       (ls/show-msg ":logseq-summarize/error content is not a link" "error"))))
-
 (defn main []
   "Registering slash commands in Logseq"
   (doseq [cmd ["summarize" "sum"]]
