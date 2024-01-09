@@ -6,15 +6,14 @@
 (def ^:private api-host
   (if goog.DEBUG
     "http://127.0.0.1:8000/"
-    "https://tldr.chat/"))
+    "https://api.tldr.chat/"))
 
 ;; curl -H 'Accept: text/markdown' https://tldr.chat/url/https://xkcd.com/1438/
 (defn- get-url
   "GET url from tldr.chat in format of markdown"
   [url]
-  (p/let [req-url (str api-host "url/" url)
-          resp (fetch/get req-url {:Accept "text/markdown"
-                                   :Content-Type "text/markdown"})
+  (p/let [req-url (str api-host "v0/url/" url)
+          resp (fetch/get req-url {:headers {:Accept "text/markdown" } })
           body (:body resp)]
     (js/console.log "response: " resp)
     (devlog "tldr/get-url" req-url body)
@@ -24,9 +23,9 @@
 (defn summarize-url
   "POST url to tldr.chat and get summary in format of markdown"
   [url]
-  (p/let [resp (fetch/post (str api-host "summarize")
-                           {:headers {:Content-Type "application/x-www-form-urlencoded"}
-                            :body (str "url=" url)})
+  (p/let [resp (fetch/post (str api-host "v0/summarize")
+                           {:headers {:Content-Type "application/json"}
+                            :body (fetch/encode-body :json {:url url} )})
           retry-countdown (atom 10)]
     (while (and (not= (:status (get-url url)) 200)
                 (pos? @retry-countdown))
