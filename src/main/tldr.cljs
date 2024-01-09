@@ -30,11 +30,14 @@
   (p/let [resp (fetch/post (str api-host "v0/summarize")
                            {:headers {:Content-Type "application/json"}
                             :body (fetch/encode-body :json {:url url})})
-          retry-countdown (atom 10)]
-    (while (and (not= (:status (get-url url)) 200)
+          retry-countdown (atom 10)
+          request-tldr (get-url url)]
+    (while (and (not= (:status request-tldr) 200)
                 (pos? @retry-countdown))
       (devlog "tldr/summarize-url" url @retry-countdown)
-      (p/delay 100000 "sleep 10s")
-      (swap! retry-countdown dec))
-    (get-url url)))
+      (p/delay
+        10000
+        (fn [] (-> (swap! retry-countdown dec)
+                   (swap! request-tldr (get-url url))))))
+    request-tldr))
     
