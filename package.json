@@ -1,6 +1,6 @@
 {
   "name": "logseq-summarize",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Logseq plugin to optimize your time with concise summaries of web pages and YouTube videos.",
   "author": "https://github.com/avelino",
   "main": "./dist/index.html",
