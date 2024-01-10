@@ -28,3 +28,4 @@ pom.xml.asc
 dist
 out
 secrets
+./package-lock.json
