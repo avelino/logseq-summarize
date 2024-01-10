@@ -39,6 +39,7 @@ jobs:
           allowUpdates: true
           draft: false
           prerelease: false
+          token: ${{ secrets.RELEASE_TOKEN }}
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
