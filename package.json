@@ -1,6 +1,6 @@
 {
   "name": "logseq-summarize",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Logseq plugin to optimize your time with concise summaries of web pages and YouTube videos, by tldr.chat",
   "author": "https://github.com/avelino",
   "main": "./dist/index.html",
@@ -16,7 +16,7 @@
     "tasks": "echo 'Please use babashka tasks defined in bb.edn. (https://babashka.org)'"
   },
   "devDependencies": {
-    "shadow-cljs": "2.26.2"
+    "shadow-cljs": "2.28.19"
   },
   "dependencies": {
     "@logseq/libs": "0.0.17"
