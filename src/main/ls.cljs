@@ -1,5 +1,5 @@
 (ns ls
-  "Interops with Logseq plugin API "
+  "Interops with Logseq plugin API"
   (:require ["@logseq/libs"]))
 
 (def show-msg js/logseq.UI.showMsg)
@@ -22,7 +22,7 @@
 ;; (def show-settings-ui js/logseq.showSettingsUI)
 
 (defn reload-plugin [plugin-id]
-  ;; In JS console: LSPluginCore.reload("logseq-url-plus")
+  ;; In JS console: LSPluginCore.reload("logseq-summarize")
   ;; Since cljs REPL runtime lives in an iframe. 
   ;; Use `top.LSPluginCore` in the parent window.
   (js-invoke js/top.LSPluginCore "reload" plugin-id))
