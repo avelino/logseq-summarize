@@ -22,8 +22,10 @@
           (ls/show-msg ":logseq-summarize/error no content found" "error")
           (ls/update-block uuid-child (:body tldr-content))))
       (ls/show-msg ":logseq-summarize/error content is not a link" "error"))))
-(defn main []
+
+(defn main
   "Registering slash commands in Logseq"
+  []
   (doseq [cmd ["summarize" "sum"]]
     (devlog "Registering slash command:" cmd)
     (ls/register-slash-command cmd summarize-block)))
