@@ -48,6 +48,7 @@
 (defn extract-link
   "extract link from current line content"
   [line-content]
+  ;; TODO: extract all links from a string and return link list
   (if (md-link? line-content)
     (:link (str->md-link line-content))
     line-content))
@@ -57,7 +58,7 @@
   (md-link->str {:label "I'm label" :link "Just a link"}))
 
 (defn content-type
-  "Return a map of :mime-type and :charset etc... 
+  "Return a map of :mime-type and :charset etc...
    from http Content-Type string say: 'application/json; charset=utf-8'
    TODO: Better use proper http client lib"
   [s]
