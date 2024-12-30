@@ -4,7 +4,15 @@
             [ls]
             [promesa.core :as p]
             [tldr]
+            [errors :as e]
             [util :as u :refer [devlog]]))
+
+(defn handle-summary-result
+  "Pure function to handle summary results"
+  [uuid-child result]
+  (if (e/api-error? result)
+    (ls/show-msg (str ":logseq-summarize/error " (:body result)) "error")
+    (ls/update-block uuid-child (:body result))))
 
 (defn summarize-block
   "Summarize current block and insert it as a child block"
@@ -16,11 +24,9 @@
             (u/md-link? line-content))
       (p/let [link       (u/extract-link line-content)
               uuid-child (:uuid (ls/insert-block block-uuid
-                                                 "processing: calling tldr.chat..."))
-              tldr-content (tldr/summarize-url (trim link))]
-        (if (empty? (:body tldr-content))
-          (ls/show-msg ":logseq-summarize/error no content found" "error")
-          (ls/update-block uuid-child (:body tldr-content))))
+                                               "processing: calling tldr.chat..."))
+              result     (tldr/summarize-url (trim link))]
+        (handle-summary-result uuid-child result))
       (ls/show-msg ":logseq-summarize/error content is not a link" "error"))))
 
 (defn main
@@ -30,8 +36,6 @@
     (devlog "Registering slash command:" cmd)
     (ls/register-slash-command cmd summarize-block)))
 
-; Logseq handshake
-; JS equivalent: `logseq.ready(main).catch(() => console.error)`
 (defn -init
   "Top level logseq methods have to be called directly"
   []
