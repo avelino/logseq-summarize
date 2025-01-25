@@ -7,53 +7,42 @@
             [util :refer [devlog]]))
 
 (def config (cfg/get-config))
+(def api-host (-> config :api :host))
+(def api-timeout (-> config :api :timeout))
 
-(defn format-md-output
-  "Pure function to format markdown output"
-  [content]
-  (string/replace content "- " (-> config :formatting :markdown-list-marker)))
-
-(defn- build-request-url
-  "Pure function to build API request URL"
-  [endpoint url]
-  (str (-> config :api :host) endpoint url))
-
-(defn- handle-response
-  "Pure function to process API response"
-  [resp]
-  (let [body (:body resp)]
-    (if (e/api-error? resp)
-      (e/error->response (:status resp) body)
-      {:status (:status resp)
-       :body (format-md-output body)})))
-
-(defn- get-url
-  "GET url from tldr.chat in format of markdown"
+(defn- get-summary
+  "Private function that fetches a summary for a given URL from the API.
+   Makes a GET request to fetch the summary in markdown format.
+   Returns a response map with:
+   - For 500+ errors: Converts error to standard response format
+   - For 200 success: Returns summary with configured markdown list markers
+   - Otherwise: Returns 202 status to continue polling"
   [url]
-  (p/let [req-url (build-request-url "/url/" url)
-          resp (fetch/get req-url {:headers {:Accept "text/markdown"}})
-          result (handle-response resp)]
-    (devlog "tldr/get-url" req-url result)
-    result))
+  (p/let [resp (fetch/get (str api-host "/url/" url)
+                          {:headers {:Accept "text/markdown"}})
+          body (:body resp)
+          status (:status resp)]
+    (devlog "get-summary response - status:" status "body:" body)
+    (cond
+      (>= status 500) (e/error->response status body)
+      (= status 200) {:status 200 :body (string/replace body "- " (-> config :formatting :markdown-list-marker))}
+      :else {:status 202})))
 
 (defn summarize-url
-  "POST url to tldr.chat and get summary in format of markdown"
+  "Summarizes content from a URL by making a POST request to initiate summarization,
+   then polling the summary endpoint until completion. Uses configured timeout between retries.
+   Returns a map containing :status and :body with the summary result."
   [url]
-  (p/let [_ (fetch/post (build-request-url "/summarize" "")
-                        {:headers {:Content-Type "application/json"}
-                         :body (fetch/encode-body :json {:url url})})
-          request-tldr (get-url url)]
-    (loop [result request-tldr]
-      (cond
-        (= (:status result) 202)
-        (do
-          (devlog "tldr/summarize-url waiting..." url)
-          (-> (p/delay (-> config :api :timeout))
-              (p/then #(get-url url))))
-              
-        (= (:status result) 200)
-        result
-        
-        :else
-        (e/error->response (:status result) 
-                          (str "tldr.chat/error - " (:body result)))))))
+  (devlog "starting summarize for URL:" url)
+  (p/let [post-resp (fetch/post (str api-host "/summarize")
+                                {:headers {:Content-Type "application/json"}
+                                 :body (fetch/encode-body :json {:url url})})
+          _         (devlog "Post response:" post-resp)
+          result    (get-summary url)]
+    (devlog "Current result:" result)
+    (if (= (:status result) 200)
+      result
+      (do
+        (devlog "not ready yet, retrying...")
+        (-> (p/delay api-timeout)
+            (p/then #(summarize-url url)))))))
