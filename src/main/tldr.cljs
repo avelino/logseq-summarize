@@ -14,14 +14,16 @@
   "Processes the response body by removing unnecessary content and formatting it.
    Returns the cleaned body text."
   [body]
-  (-> body
-      (string/trim)
-      (string/replace #"\n{3,}" "\n\n") ; Replace multiple newlines with double newline
-      (string/replace #"^\s*[-*]\s*" "") ; Remove leading list markers
-      (string/replace #"(?m)^\s*$\n" "") ; Remove empty lines
-      (string/replace #"</?faq>" "") ; Remove faq tags
-      (string/replace #"(?m)^###\s*(.*)" "\n**$1**") ; Convert headers 3 to bold
-      (string/replace "- " (-> config :formatting :markdown-list-marker))))
+  (->> [{:pattern #"\n{3,}" :replacement "\n\n"} ; Normalize newlines
+        {:pattern #"^\s*[-*]\s*" :replacement ""} ; Remove list markers
+        {:pattern #"(?m)^\s*$\n" :replacement ""} ; Remove empty lines
+        {:pattern #"</?faq>" :replacement ""} ; Remove FAQ tags
+        {:pattern #"(?m)^###\s*(.*)" :replacement "\n**$1**"} ; Headers to bold
+        {:pattern #"^- " :replacement (-> config :formatting :markdown-list-marker)}]
+       (reduce (fn
+                 [text {:keys [pattern replacement]}]
+                 (string/replace text pattern replacement))
+               (string/trim body))))
 
 (defn- get-summary
   "Private function that fetches a summary for a given URL from the API.
