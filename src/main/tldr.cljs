@@ -10,6 +10,19 @@
 (def api-host (-> config :api :host))
 (def api-timeout (-> config :api :timeout))
 
+(defn- process-body
+  "Processes the response body by removing unnecessary content and formatting it.
+   Returns the cleaned body text."
+  [body]
+  (-> body
+      (string/trim)
+      (string/replace #"\n{3,}" "\n\n") ; Replace multiple newlines with double newline
+      (string/replace #"^\s*[-*]\s*" "") ; Remove leading list markers
+      (string/replace #"(?m)^\s*$\n" "") ; Remove empty lines
+      (string/replace #"</?faq>" "") ; Remove faq tags
+      (string/replace #"(?m)^###\s*(.*)" "\n**$1**") ; Convert headers 3 to bold
+      (string/replace "- " (-> config :formatting :markdown-list-marker))))
+
 (defn- get-summary
   "Private function that fetches a summary for a given URL from the API.
    Makes a GET request to fetch the summary in markdown format.
@@ -25,7 +38,7 @@
     (devlog "get-summary response - status:" status "body:" body)
     (cond
       (>= status 500) (e/error->response status body)
-      (= status 200) {:status 200 :body (string/replace body "- " (-> config :formatting :markdown-list-marker))}
+      (= status 200) {:status 200 :body (process-body body)}
       :else {:status 202})))
 
 (defn summarize-url
