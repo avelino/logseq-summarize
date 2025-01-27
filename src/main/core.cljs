@@ -24,8 +24,17 @@
             (u/md-link? line-content))
       (p/let [link       (u/extract-link line-content)
               uuid-child (:uuid (ls/insert-block block-uuid
-                                               "processing: calling tldr.chat..."))
-              result     (tldr/summarize-url (trim link))]
+                                                 "processing: calling tldr.chat..."))
+              loading    (atom ["." ".." "..." "...." "..." ".."])
+              interval   (js/setInterval
+                          #(do
+                             (ls/update-block uuid-child
+                                              (str "processing: calling tldr.chat" (first @loading)))
+                             (swap! loading (fn [curr]
+                                              (conj (vec (rest curr)) (first curr)))))
+                          500)
+              result     (tldr/summarize-url (trim link))
+              _         (js/clearInterval interval)]
         (handle-summary-result uuid-child result))
       (ls/show-msg ":logseq-summarize/error content is not a link" "error"))))
 
