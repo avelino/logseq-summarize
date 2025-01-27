@@ -14,7 +14,7 @@
   "Processes the response body by removing unnecessary content and formatting it.
    Returns the cleaned body text."
   [body]
-  (->> [{:pattern #"\n{3,}" :replacement "\n\n"} ; Normalize newlines
+  (->> [{:pattern #"\n{3,}" :replacement "\n"} ; Normalize newlines
         {:pattern #"^\s*[-*]\s*" :replacement ""} ; Remove list markers
         {:pattern #"(?m)^\s*$\n" :replacement ""} ; Remove empty lines
         {:pattern #"</?faq>" :replacement ""} ; Remove FAQ tags
