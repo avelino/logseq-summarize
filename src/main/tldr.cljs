@@ -19,7 +19,7 @@
         {:pattern #"(?m)^\s*$\n" :replacement ""} ; Remove empty lines
         {:pattern #"</?faq>" :replacement ""} ; Remove FAQ tags
         {:pattern #"(?m)^###\s*(.*)" :replacement "\n**$1**"} ; Headers to bold
-        {:pattern #"^- " :replacement (-> config :formatting :markdown-list-marker)}]
+        {:pattern "- " :replacement (-> config :formatting :markdown-list-marker)}]
        (reduce (fn
                  [text {:keys [pattern replacement]}]
                  (string/replace text pattern replacement))
