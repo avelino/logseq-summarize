@@ -40,6 +40,7 @@
     (devlog "get-summary response - status:" status "body:" body)
     (cond
       (>= status 500) (e/error->response status body)
+      (= status 404) {:status 404 :body body}
       (= status 200) {:status 200 :body (process-body body)}
       :else {:status 202})))
 
@@ -55,8 +56,10 @@
           _         (devlog "Post response:" post-resp)
           result    (get-summary url)]
     (devlog "Current result:" result)
-    (if (= (:status result) 200)
-      result
+    (cond
+      (= (:status result) 404) {:status 404 :body (:body result)}
+      (= (:status result) 200) result
+      :else
       (do
         (devlog "not ready yet, retrying...")
         (-> (p/delay api-timeout)
