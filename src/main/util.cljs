@@ -18,31 +18,31 @@
 ;; Debug helpers
 (def decode-html-content gtext/extractTextContent)
 
-(defn devlog 
+(defn devlog
   "Pure logging function that only runs in debug mode"
   [& msgs]
   (when goog.DEBUG
     (apply js/console.log (into ["Logseq Summarize"] msgs))))
 
 ;; DOM helpers
-(defn target-value 
+(defn target-value
   "Pure function to extract value from DOM event"
   [e]
   (.. e -target -value))
 
-(defn target-checked 
+(defn target-checked
   "Pure function to extract checked state from DOM event"
   [e]
   (.. e -target -checked))
 
 ;; Data transformation
-(defn ednize 
+(defn ednize
   "Pure function to convert JS data to EDN"
   [data]
   (js->clj data :keywordize-keys true))
 
 ;; URL handling
-(defn url? 
+(defn url?
   "Pure predicate to check if string is valid URL"
   [s]
   {:pre [(string? s)]}
@@ -50,7 +50,7 @@
     (do (js/URL. s) true)
     (catch js/Object _ false)))
 
-(defn http? 
+(defn http?
   "Pure predicate to check if string is HTTP URL"
   [s]
   {:pre [(string? s)]}
@@ -62,18 +62,22 @@
   "Pure function to parse markdown link string into map"
   [s]
   {:pre [(string? s)]}
-  (some->> (str/trim s)
-           (re-find #"\[(.*?)\]\((.*?)\)")
-           rest
-           (#(-> {:label (first %) :link (second %)}))))
+  (let [trimmed (str/trim s)
+        md-link (re-find #"\[(.*?)\]\((.*?)\)" trimmed)
+        url (re-find #"https?://\S+" trimmed)]
+    (cond
+      md-link (-> {:label (first (rest md-link))
+                   :link (second (rest md-link))})
+      url {:label url :link url}
+      :else nil)))
 
-(defn md-link->str 
+(defn md-link->str
   "Pure function to convert markdown link map to string"
   [{:keys [label link] :as md-link}]
   {:pre [(s/valid? ::md-link md-link)]}
   (str/format "[%s](%s)" label link))
 
-(defn md-link? 
+(defn md-link?
   "Pure predicate to check if string is markdown link"
   [s]
   {:pre [(string? s)]}
